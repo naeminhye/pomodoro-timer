@@ -21,25 +21,46 @@ import {
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field"
+import { useTimerSettingsStore } from "@/store/timerSettingsStore";
+import { useCallback } from "react";
 
 function Header() {
+    const setSettings = useTimerSettingsStore((state) => state.setSettings);
+    const currentStoreState = useTimerSettingsStore.getState();
+
     const form = useForm({
         defaultValues: {
-            focusTime: 25,
-            shortBreakTime: 5,
-            longBreakTime: 15,
-            autoBreak: false,
-            autoFocus: false,
-            longBreakInterval: 4,
+            focusTime: currentStoreState?.focusTime ?? 25,
+            shortBreakTime: currentStoreState?.shortBreakTime ?? 5,
+            longBreakTime: currentStoreState?.longBreakTime ?? 15,
+            autoBreak: currentStoreState?.autoBreak ?? false,
+            autoFocus: currentStoreState?.autoFocus ?? false,
+            longBreakInterval: currentStoreState?.longBreakInterval ?? 4,
         },
         // validators: {
         //     onSubmit: formSchema,
         // },
         onSubmit: async ({ value }) => {
-            console.log("value", value)
-        },
-    })
+            console.log("Saving new settings:", value);
 
+            const updates = {
+                focusTime: value.focusTime,
+                shortBreakTime: value.shortBreakTime,
+                longBreakTime: value.longBreakTime,
+                autoBreak: value.autoBreak,
+                autoFocus: value.autoFocus,
+                longBreakInterval: value.longBreakInterval,
+            };
+
+            // Call the batch update action
+            setSettings(updates);
+            console.log('Settings updated successfully!');
+        },
+    });
+
+    const handleDismiss = () => {
+        form.reset();
+    }
 
     return (
         <div className="flex justify-between items-center">
@@ -164,9 +185,9 @@ function Header() {
                         </FieldGroup>
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
+                                <Button variant="outline" onClick={handleDismiss}>Cancel</Button>
                             </DialogClose>
-                            <Button variant="outline" type="submit" form="setting-form">Save changes</Button>
+                            <Button variant="outline" form="setting-form" type="submit">Save changes</Button>
                         </DialogFooter>
                     </DialogContent>
                 </form>
