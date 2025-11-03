@@ -27,7 +27,7 @@ function ModeSelector(props: any) {
     }, [])
 
     return (
-        <div className="flex justify-center space-x-2 bg-gray-100 rounded-full p-2">
+        <div className="flex justify-center space-x-2 bg-gray-100 dark:bg-black dark:border-gray-100 rounded-full p-1">
             {Object.values(MODES).map((mode) => {
                 const modeKey = toKebabCase(mode);
                 return (
@@ -46,9 +46,12 @@ function ModeSelector(props: any) {
                             className={`
                             px-4 py-1.5 text-sm font-medium rounded-full cursor-pointer 
                             transition-colors duration-200 w-full text-center
-                            text-gray-700 
+                            text-gray-700
+                            dark:text-gray-100 
                             peer-checked:bg-stone-950 
                             peer-checked:text-white
+                            peer-checked:dark:bg-zinc-100
+                            peer-checked:dark:text-black
                             flex gap-2 justify-center items-center
                         `}
                         >

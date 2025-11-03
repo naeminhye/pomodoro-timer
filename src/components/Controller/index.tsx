@@ -42,34 +42,34 @@ function Controller(props: ControllerProps) {
 
     return (
         <div className="flex flex-wrap items-center gap-2 md:flex-row">
-            {state !== "STOPPED" && <Button variant="outline" aria-label={mainBtnLabel} onClick={onMainClick}>
+            {state !== "STOPPED" && <Button variant="default" aria-label={mainBtnLabel} onClick={onMainClick}>
                 <DynamicIcon name={mainBtnIcon} />
                 <span className="hidden sm:inline">{mainBtnLabel}</span>
             </Button>}
-            {state !== "IDLE" && state !== "STOPPED" && <Button variant="outline" aria-label="Reset" onClick={onResetClick}>
+            {state !== "IDLE" && state !== "STOPPED" && <Button variant="default" aria-label="Reset" onClick={onResetClick}>
                 <RotateCcw />
                 <span className="hidden sm:inline">Reset</span>
             </Button>}
             {state === "STOPPED" && <>
                 {mode === MODES.FOCUS ? <>
-                    <Button variant="outline" aria-label="Restart Focus" onClick={() => onStartMode(MODES.FOCUS)}>
+                    <Button variant="default" aria-label="Restart Focus" onClick={() => onStartMode(MODES.FOCUS)}>
                         <BicepsFlexed />
                         <span className="hidden sm:inline">Restart Focus</span>
                     </Button>
-                    <Button variant="outline" aria-label="Short" onClick={() => onStartMode(MODES.SHORT_BREAK)}>
+                    <Button variant="default" aria-label="Short" onClick={() => onStartMode(MODES.SHORT_BREAK)}>
                         <Coffee />
                         <span className="hidden sm:inline">Short</span>
                     </Button>
-                    <Button variant="outline" aria-label="Long" onClick={() => onStartMode(MODES.LONG_BREAK)}>
+                    <Button variant="default" aria-label="Long" onClick={() => onStartMode(MODES.LONG_BREAK)}>
                         <Footprints />
                         <span className="hidden sm:inline">Long</span>
                     </Button>
                 </> : <>
-                    <Button variant="outline" aria-label="Start Focus" onClick={() => onStartMode(MODES.FOCUS)}>
+                    <Button variant="default" aria-label="Start Focus" onClick={() => onStartMode(MODES.FOCUS)}>
                         <BicepsFlexed />
                         <span className="hidden sm:inline">Start Focus</span>
                     </Button>
-                    <Button variant="outline"  aria-label={mode} onClick={() => onStartMode(mode)}>
+                    <Button variant="default"  aria-label={mode} onClick={() => onStartMode(mode)}>
                         <RotateCcw />
                         <span className="hidden sm:inline">Another {mode}</span>
                     </Button>

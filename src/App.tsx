@@ -1,13 +1,16 @@
-import './App.css'
 import Header from './components/Header'
 import PomodoroTimer from './components/PomodoroTimer'
 
+import { ThemeProvider } from "@/components/theme-provider"
+
 function App() {
   return (
-    <div className="w-screen h-screen flex flex-col p-4">
-      <Header />
-      <PomodoroTimer />
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="w-screen h-screen flex flex-col p-4">
+        <Header />
+        <PomodoroTimer />
+      </div>
+    </ThemeProvider>
   )
 }
 

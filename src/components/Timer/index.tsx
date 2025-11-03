@@ -8,9 +8,9 @@ function Timer(props: any) {
   const { m, s } = useMemo(() => timeConverter(timeRemaining), [timeRemaining]);
 
   return (
-    <div className="flex flex-row text-9xl font-extrabold justify-center items-center">
+    <div className="flex flex-row text-6xl sm:text-9xl font-extrabold justify-center items-center">
       <span>{zeroPad(m)}</span>
-      <span className="text-8xl mx-4">:</span>
+      <span className="mx-2 sm:mx-4 text-5xl sm:text-8xl">:</span>
       <span>{zeroPad(s)}</span>
     </div>
   )
