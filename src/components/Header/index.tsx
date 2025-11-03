@@ -111,14 +111,39 @@ function Header() {
                                     }} />
                             </div>
 
-                            <div className="flex justify-between items-center">
-                                <Label htmlFor="auto-start-breaks">Auto Start Breaks</Label>
-                                <Switch id="auto-start-breaks" name="autoBreak" />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <Label htmlFor="auto-start-focus">Auto Start Focus</Label>
-                                <Switch id="auto-start-focus" name="autoFocus" />
-                            </div>
+                            <form.Field
+                                name="autoBreak"
+                                children={(field) => {
+                                    return (
+                                        <Field>
+                                            <div className="flex justify-between items-center">
+                                                <FieldLabel htmlFor={field.name}>Auto Start Breaks</FieldLabel>
+                                                <Switch
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    checked={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onCheckedChange={(checked) => field.handleChange(checked)} />
+                                            </div>
+                                        </Field>)
+                                }} />
+
+                            <form.Field
+                                name="autoFocus"
+                                children={(field) => {
+                                    return (
+                                        <Field>
+                                            <div className="flex justify-between items-center">
+                                                <FieldLabel htmlFor={field.name}>Auto Start Focus</FieldLabel>
+                                                <Switch
+                                                    id={field.name}
+                                                    name={field.name}
+                                                    checked={field.state.value}
+                                                    onBlur={field.handleBlur}
+                                                    onCheckedChange={(checked) => field.handleChange(checked)} />
+                                            </div>
+                                        </Field>)
+                                }} />
 
                             <form.Field
                                 name="longBreakInterval"
