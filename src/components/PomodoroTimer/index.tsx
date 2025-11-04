@@ -9,9 +9,13 @@ import { useTimerSettingsStore } from "@/store/timerSettingsStore";
 import Timer from "../Timer";
 import Controller from "../Controller";
 import ModeSelector from "../ModeSelector";
-import { playAlarm } from "@/utils/helpers";
+import { playSound } from "@/utils/helpers";
 
 const ALARM_SOUND_URL = "/sounds/alarm_beep.mp3";
+// const TICKING_SOUND_URL = "/sounds/clock_ticking.mp3";
+
+// const audio = new Audio(TICKING_SOUND_URL);
+// audio.loop = true;
 
 function PomodoroTimer() {
     const focusTime = useTimerSettingsStore((state) => state.focusTime);
@@ -46,38 +50,16 @@ function PomodoroTimer() {
             setTimeRemaining(prevTime => {
                 if (prevTime <= 1) {
                     clearInterval(intervalRef.current);
-                    setTimerState('STOPPED');
-                    playAlarm(ALARM_SOUND_URL, () => {
-                        console.log("Finished playing sound!");
+                    playSound(ALARM_SOUND_URL, () => {
+                        setTimerState('STOPPED');
                     });
-                    // Handle auto focus/autobreak
-                    if (currentMode === MODES.FOCUS) {
-                        const count = focusCount + 1;
-                        setFocusCount(count);
-                        if (autoBreak) {
-                            if (count < longBreakInterval) {
-                                // Auto run Short Break
-                                handleStartMode(MODES.SHORT_BREAK);
-                            }
-                            else {
-                                // Auto run Long Break
-                                handleStartMode(MODES.LONG_BREAK);
-                                setFocusCount(0);
-                            }
-                        }
-                    }
-                    else {
-                        if (autoFocus) {
-                            handleStartMode(MODES.FOCUS);
-                        }
-                    }
                     return 0;
                 }
                 return prevTime - 1;
             });
         }, 1000);
         intervalRef.current = id;
-    }, [timerState, setTimerState, timeRemaining, setTimeRemaining]);
+    }, [timerState, timeRemaining, focusCount, currentMode]);
 
     const handleMainButtonClick = useCallback(() => {
         if (timerState === "IDLE" || timerState === "PAUSED") {
@@ -91,6 +73,11 @@ function PomodoroTimer() {
             }
         }
     }, [handleStartResumeTimer, timerState, setTimerState, timeRemaining, setTimeRemaining]);
+
+    const handleResetButtonClick = useCallback(() => {
+        handleResetTimer();
+        setFocusCount(0);
+    }, []);
 
     const handleResetTimer = useCallback(() => {
         if (intervalRef.current !== null) {
@@ -114,18 +101,54 @@ function PomodoroTimer() {
 
     useEffect(() => {
         setTimeRemaining(timeOfModes[currentMode]);
-    }, [JSON.stringify(timeOfModes), currentMode]);
+        console.log(">>>", currentMode)
+    }, [focusTime, shortBreakTime, longBreakTime, currentMode]);
+
+    // useEffect(() => {
+    //     if (timerState === "RUNNING") {
+    //         audio.play();
+    //     }
+    //     else {
+    //         audio.pause();
+    //     }
+    // }, [timerState]);
+
+    useEffect(() => {
+        if (timerState !== 'STOPPED') return;
+
+        // Handle auto focus/autobreak
+        if (currentMode === MODES.FOCUS) {
+            const count = focusCount + 1;
+            setFocusCount(count);
+            if (autoBreak) {
+                if (count < longBreakInterval) {
+                    // Auto run Short Break
+                    handleStartMode(MODES.SHORT_BREAK);
+                }
+                else {
+                    // Auto run Long Break
+                    handleStartMode(MODES.LONG_BREAK);
+                    setFocusCount(0);
+                }
+            }
+        }
+        else {
+            if (autoFocus) {
+                handleStartMode(MODES.FOCUS);
+            }
+        }
+    }, [timerState, currentMode]);
 
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-4">
             <ModeSelector currentMode={currentMode} onChangeMode={handleChangeMode} />
-            <Timer timeRemaining={timeRemaining} mode={currentMode} isRunning={timerState === "RUNNING"} />
+            <Timer timeRemaining={timeRemaining} mode={currentMode} />
 
             <Progress value={progress} className="w-3xs h-1 mb-2" />
 
             <Controller state={timerState} mode={currentMode}
                 onMainClick={handleMainButtonClick}
-                onResetClick={handleResetTimer}
+                onResetClick={handleResetButtonClick}
                 onStartMode={handleStartMode}></Controller>
         </div>
     )

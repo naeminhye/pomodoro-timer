@@ -3,25 +3,16 @@ import { useEffect, useMemo } from 'react';
 import { timeConverter } from '@/utils/helpers';
 import { MODES } from '@/utils/constants';
 
-const titles = ["Focus Time ⏱", "Short Break ☕️", "Long Break 💤"];
-
-
 function Timer(props: any) {
   const { timeRemaining, mode } = props;
 
   const { h, m, s } = useMemo(() => timeConverter(timeRemaining), [timeRemaining]);
-  const modeTitle = useMemo(() => {
-    if (mode === MODES.FOCUS) {
-      return titles[0];
-    }
-    if (mode === MODES.SHORT_BREAK) {
-      return titles[1];
-    }
-    return titles[3];
-  }, [mode])
 
   useEffect(() => {
-    document.title = (h !== '00' ? `${h}:` : '') + m + ':' + s + ` - ${modeTitle}`;
+    const remaining = (h !== '00' ? `${h}:` : '') + m + ':' + s;
+    if (mode === MODES.FOCUS) document.title = `Focus ${remaining} ⏱`;
+    else if (mode === MODES.SHORT_BREAK) document.title = `Break ${remaining} ☕`;
+    else document.title = `Long Break ${remaining} 💤`;
   }, [h, m, s]);
 
   return (

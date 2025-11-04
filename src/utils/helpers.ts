@@ -25,7 +25,7 @@ function toKebabCase(str: string) {
         .toLowerCase(); // Convert the entire string to lowercase
 }
 
-const playAlarm = (url: string, onEnded?: () => void) => {
+const playSound = (url: string, onEnded?: () => void) => {
     const audio = new Audio(url);
     audio.loop = false;
     audio.volume = 1;
@@ -43,4 +43,4 @@ const playAlarm = (url: string, onEnded?: () => void) => {
 };
 
 
-export { timeConverter, toKebabCase, zeroPad, playAlarm }
+export { timeConverter, toKebabCase, zeroPad, playSound }

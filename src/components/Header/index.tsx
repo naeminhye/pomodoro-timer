@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "@tanstack/react-form"
 
-import { AlarmClockCheck, Settings, Sun, Moon } from 'lucide-react';
+import { AlarmClockCheck, Settings, Sun, Moon, PictureInPicture, Expand, Shrink } from 'lucide-react';
+
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -27,19 +29,21 @@ import { useTheme } from "@/components/theme-provider"
 import { DEFAULT_LONG_BREAK_INTERVAL, DEFAULT_TIMES_IN_SECONDS, MODES } from "@/utils/constants";
 
 
-function Header() {
+const Header = (props: any) => { // TODO: add props
+    const { onShowPiP, isFullScreen, onToggleFullScreen } = props;
+
     const { theme, setTheme } = useTheme();
 
     const setSettings = useTimerSettingsStore((state) => state.setSettings);
     // const { focusTime, shortBreakTime, longBreakTime,autoBreak, autoFocus, longBreakInterval } = useTimerSettingsStore((state) => state.getTimerSettings)();
-    
+
     const focusTime = useTimerSettingsStore((state) => state.focusTime);
     const shortBreakTime = useTimerSettingsStore((state) => state.shortBreakTime);
     const longBreakTime = useTimerSettingsStore((state) => state.longBreakTime);
     const autoBreak = useTimerSettingsStore((state) => state.autoBreak);
     const autoFocus = useTimerSettingsStore((state) => state.autoFocus);
     const longBreakInterval = useTimerSettingsStore((state) => state.longBreakInterval);
-    
+
     const form = useForm({
         defaultValues: {
             focusTime: (focusTime ?? DEFAULT_TIMES_IN_SECONDS[MODES.FOCUS]) / 60,
@@ -78,6 +82,8 @@ function Header() {
         <div className="flex justify-between items-center">
             <div className="flex gap-2 justify-center items-center"><AlarmClockCheck /><span className="font-bold text-xl">Pomodoro</span></div>
             <div className="flex gap-2 justify-center items-center">
+                <Button variant="outline" size="icon" className="rounded-full" onClick={onShowPiP}><PictureInPicture /></Button>
+
                 <Dialog>
                     <form id="setting-form"
                         onSubmit={(e) => {
@@ -209,7 +215,9 @@ function Header() {
                     </form>
                 </Dialog>
                 <Button variant="outline" size="icon" className="rounded-full" onClick={handleChangeTheme}>{theme === "dark" ? <Sun /> : <Moon />}</Button>
-
+                <Button variant="outline" size="icon" className="rounded-full" onClick={onToggleFullScreen}>
+                    {isFullScreen ? <Shrink /> : <Expand />}
+                </Button>
             </div>
         </div>
     )

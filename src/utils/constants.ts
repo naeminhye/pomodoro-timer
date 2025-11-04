@@ -25,3 +25,5 @@ export const MODE_COLORS = {
     [MODES.SHORT_BREAK]: '#28a745',  // A green color
     [MODES.LONG_BREAK]: '#007bff',   // A blue color
 };
+
+export const HIDE_ESC_FS_BUTTON_TIMEOUT = 3000; // 3s

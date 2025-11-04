@@ -32,7 +32,6 @@ export const useTimerSettingsStore = create<TimerSettingsState>()(
   devtools(
     persist(
       (set, get) => ({
-        // --- Initial State ---
         focusTime: DEFAULT_TIMES_IN_SECONDS[MODES.FOCUS],
         shortBreakTime: DEFAULT_TIMES_IN_SECONDS[MODES.SHORT_BREAK],
         longBreakTime: DEFAULT_TIMES_IN_SECONDS[MODES.LONG_BREAK],
@@ -41,11 +40,9 @@ export const useTimerSettingsStore = create<TimerSettingsState>()(
         longBreakInterval: DEFAULT_LONG_BREAK_INTERVAL,
         history: {},
 
-        // --- Actions ---
         setSetting: (key, value) => set({ [key]: value }),
         setSettings: (updates) => {
           set(updates);
-          // Save settings to LocalStorage
         },
         addHistory: (entry) =>
           set((state) => ({
@@ -63,6 +60,7 @@ export const useTimerSettingsStore = create<TimerSettingsState>()(
           longBreakInterval: get().longBreakInterval,
         })
       }),
+      // Save settings to session storage
       {
         name: 'pomodoro-timer-storage',
         storage: createJSONStorage(() => sessionStorage),
