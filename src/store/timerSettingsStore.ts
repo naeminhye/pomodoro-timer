@@ -20,8 +20,14 @@ interface TimerSettingsState {
     value: TimerSettingsState[K]
   ) => void;
   setSettings: (updates: Partial<Omit<TimerSettingsState, 'history' | 'setSetting' | 'addHistory' | 'setSettings'>>) => void;
-  getTimerSettings: () => any;
-
+  getTimerSettings: () => {
+    focusTime: number;
+    shortBreakTime: number;
+    longBreakTime: number;
+    autoBreak: boolean;
+    autoFocus: boolean;
+    longBreakInterval: number;
+  };
   startSession: (type: PomodoroMode, name: string) => void;
   completeSession: () => void;
   cancelSession: () => void;
@@ -81,10 +87,10 @@ export const useTimerSettingsStore = create<TimerSettingsState>()(
           if (!currentSession) return;
 
           const endTime = new Date().toISOString();
-          
+
           const duration = Math.floor((new Date(endTime).getTime() -
-              new Date(currentSession.startTime).getTime()) /
-              1000);
+            new Date(currentSession.startTime).getTime()) /
+            1000);
 
           const completedSession: PomodoroSession = {
             ...currentSession,

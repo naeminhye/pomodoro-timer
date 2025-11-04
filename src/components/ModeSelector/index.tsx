@@ -1,19 +1,25 @@
 
 import { DynamicIcon } from 'lucide-react/dynamic';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { MODES } from '@/utils/constants';
-
 import { toKebabCase } from '@/utils/helpers';
+import type { PomodoroMode } from '@/utils/types';
 
-function ModeSelector(props: any) {
+interface ModeSelectorProps {
+    currentMode: PomodoroMode;
+    onChangeMode: (mode: PomodoroMode) => void;
+
+}
+
+function ModeSelector(props: ModeSelectorProps) {
     const { currentMode, onChangeMode } = props;
 
-    const handleValueChange = useCallback((e: any) => {
-        onChangeMode(e.target.value);
+    const handleValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        onChangeMode(e.target.value as PomodoroMode);
     }, [onChangeMode]);
 
-    const getIcon = useCallback((mode: any) => {
+    const getIcon = useCallback((mode: PomodoroMode) => {
         switch (mode) {
             case MODES.FOCUS:
                 return "crosshair";

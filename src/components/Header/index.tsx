@@ -39,8 +39,12 @@ import { useTheme } from "@/components/theme-provider"
 import { DEFAULT_LONG_BREAK_INTERVAL, DEFAULT_TIMES_IN_SECONDS, MODES } from "@/utils/constants";
 import HistoryBoard from "../HistoryBoard";
 
+interface HeaderProps {
+    isFullScreen: boolean;
+    onToggleFullScreen: () => void;
+}
 
-const Header = (props: any) => { // TODO: add props
+const Header = (props: HeaderProps) => {
     const { isFullScreen, onToggleFullScreen } = props;
 
     const { theme, setTheme } = useTheme();
@@ -80,12 +84,12 @@ const Header = (props: any) => { // TODO: add props
     }
 
     const handleChangeTheme = () => {
-        theme === "dark" ? setTheme("light") : setTheme("dark");
+        setTheme(theme === "dark" ? "light" : "dark");
     }
 
     useEffect(() => {
         form.reset();
-    }, [focusTime, shortBreakTime, longBreakTime, autoBreak, autoFocus, longBreakInterval])
+    }, [form, focusTime, shortBreakTime, longBreakTime, autoBreak, autoFocus, longBreakInterval])
 
     return (
         <div className="flex justify-between items-center">
@@ -137,7 +141,7 @@ const Header = (props: any) => { // TODO: add props
                                                             name={field.name}
                                                             value={field.state.value}
                                                             onBlur={field.handleBlur}
-                                                            onChange={(e: any) => field.handleChange(e.target.value)}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(Number(e.target.value))}
                                                             type="number" step={1} min={0} />
                                                     </div>
                                                 </Field>)
@@ -154,7 +158,7 @@ const Header = (props: any) => { // TODO: add props
                                                             name={field.name}
                                                             value={field.state.value}
                                                             onBlur={field.handleBlur}
-                                                            onChange={(e: any) => field.handleChange(e.target.value)}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(Number(e.target.value))}
                                                             type="number" step={1} min={0} />
                                                     </div>
                                                 </Field>)
@@ -170,7 +174,7 @@ const Header = (props: any) => { // TODO: add props
                                                             name={field.name}
                                                             value={field.state.value}
                                                             onBlur={field.handleBlur}
-                                                            onChange={(e: any) => field.handleChange(e.target.value)}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(Number(e.target.value))}
                                                             type="number" step={1} min={0} />
                                                     </div>
                                                 </Field>)
@@ -219,7 +223,7 @@ const Header = (props: any) => { // TODO: add props
                                                         name={field.name}
                                                         value={field.state.value}
                                                         onBlur={field.handleBlur}
-                                                        onChange={(e: any) => field.handleChange(e.target.value)}
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(Number(e.target.value))}
                                                         className="w-24" type="number" step={1} min={1} />
                                                 </div>
                                             </Field>)

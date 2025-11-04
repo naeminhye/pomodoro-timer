@@ -2,8 +2,14 @@ import { useEffect, useMemo } from 'react';
 
 import { timeConverter } from '@/utils/helpers';
 import { MODES } from '@/utils/constants';
+import type { PomodoroMode } from '@/utils/types';
 
-function Timer(props: any) {
+interface TimerProps {
+  timeRemaining: number;
+  mode: PomodoroMode;
+}
+
+function Timer(props: TimerProps) {
   const { timeRemaining, mode } = props;
 
   const { h, m, s } = useMemo(() => timeConverter(timeRemaining), [timeRemaining]);
@@ -13,7 +19,7 @@ function Timer(props: any) {
     if (mode === MODES.FOCUS) document.title = `Focus ${remaining} ⏱`;
     else if (mode === MODES.SHORT_BREAK) document.title = `Break ${remaining} ☕`;
     else document.title = `Long Break ${remaining} 💤`;
-  }, [h, m, s]);
+  }, [h, m, s, mode]);
 
   return (
     <div className="flex flex-row text-6xl sm:text-9xl lg:text-[180px] font-extrabold justify-center items-center text-neutral-900 dark:text-neutral-50">

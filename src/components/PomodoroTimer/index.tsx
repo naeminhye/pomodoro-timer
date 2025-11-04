@@ -35,9 +35,9 @@ function PomodoroTimer() {
     const [focusCount, setFocusCount] = useState<number>(0);
     const [showFireworks, setShowFireworks] = useState<boolean>(false);
 
+    const progress = useMemo(() => (100 - Math.floor(timeRemaining / timeOfModes[currentMode] * 100)), [timeRemaining, timeOfModes, currentMode]);
 
-    const progress = useMemo(() => (100 - Math.floor(timeRemaining / timeOfModes[currentMode] * 100)), [timeRemaining]);
-    const intervalRef = useRef<any>(null); // TODO: fix issue
+    const intervalRef = useRef<null | number>(null);
 
     const handleStartResumeTimer = useCallback((mode: PomodoroMode) => {
         if (intervalRef.current !== null) {
@@ -52,7 +52,7 @@ function PomodoroTimer() {
         const id = setInterval(() => {
             setTimeRemaining(prevTime => {
                 if (prevTime <= 1) {
-                    clearInterval(intervalRef.current);
+                    clearInterval(intervalRef?.current || undefined);
                     setTimerState('STOPPED');
                     return 0;
                 }
@@ -60,7 +60,7 @@ function PomodoroTimer() {
             });
         }, 1000);
         intervalRef.current = id;
-    }, [timerState, timeRemaining, focusCount, currentMode]);
+    }, [timerState, history?.length, startSession]);
 
     const handleMainButtonClick = useCallback(() => {
         if (timerState === "IDLE" || timerState === "PAUSED") {
@@ -73,13 +73,7 @@ function PomodoroTimer() {
                 intervalRef.current = null;
             }
         }
-    }, [handleStartResumeTimer, timerState, setTimerState, timeRemaining, setTimeRemaining, currentMode]);
-
-    const handleResetButtonClick = useCallback(() => {
-        handleResetTimer();
-        setFocusCount(0);
-        cancelSession();
-    }, []);
+    }, [handleStartResumeTimer, timerState, setTimerState, currentMode]);
 
     const handleResetTimer = useCallback(() => {
         if (intervalRef.current !== null) {
@@ -88,13 +82,19 @@ function PomodoroTimer() {
         }
         setTimerState("IDLE");
         setTimeRemaining(timeOfModes[currentMode]);
-    }, [setTimerState]);
+    }, [currentMode, timeOfModes, setTimerState]);
+
+    const handleResetButtonClick = useCallback(() => {
+        handleResetTimer();
+        setFocusCount(0);
+        cancelSession();
+    }, [cancelSession, handleResetTimer]);
 
     const handleChangeMode = useCallback((mode: PomodoroMode) => {
         handleResetTimer();
         setCurrentMode(mode);
         setTimeRemaining(timeOfModes[mode]);
-    }, [setCurrentMode]);
+    }, [timeOfModes, setCurrentMode, handleResetTimer]);
 
     const handleStartMode = useCallback((mode: PomodoroMode) => {
         handleChangeMode(mode);
@@ -103,7 +103,7 @@ function PomodoroTimer() {
 
     useEffect(() => {
         setTimeRemaining(timeOfModes[currentMode]);
-    }, [focusTime, shortBreakTime, longBreakTime, currentMode]);
+    }, [focusTime, shortBreakTime, longBreakTime, currentMode, timeOfModes]);
 
     // useEffect(() => {
     //     if (timerState === "RUNNING") {
@@ -145,7 +145,9 @@ function PomodoroTimer() {
                 handleStartMode(MODES.FOCUS);
             }
         }
-    }, [timerState, currentMode]);
+    },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [timerState, currentMode]);
 
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-4">

@@ -4,7 +4,6 @@ import { useTimerSettingsStore } from "@/store/timerSettingsStore";
 import { Button } from "@/components/ui/button";
 import {
     Empty,
-    EmptyDescription,
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,

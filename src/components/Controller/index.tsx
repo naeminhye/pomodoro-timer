@@ -9,9 +9,9 @@ import { MODES } from '@/utils/constants';
 interface ControllerProps {
     state: TimerState;
     mode: PomodoroMode;
-    onMainClick: any; // TODO: add interface
-    onResetClick: any; // TODO: add interface
-    onStartMode: any;
+    onMainClick: () => void;
+    onResetClick: () => void;
+    onStartMode: (mode: PomodoroMode) => void;
 }
 
 function Controller(props: ControllerProps) {

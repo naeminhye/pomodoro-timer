@@ -14,7 +14,11 @@ function App() {
   const fsHandle = useFullScreenHandle();
 
   const handleToggleFullScreen = () => {
-    fsHandle.active ? fsHandle.exit() : fsHandle.enter()
+    if (fsHandle.active) {
+      fsHandle.exit();
+      return;
+    }
+    fsHandle.enter();
   }
 
   const [escFSVisible, setEscFSVisible] = useState(true);

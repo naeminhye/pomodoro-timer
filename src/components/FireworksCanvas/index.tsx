@@ -1,6 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+interface Particle {
+    x: number
+    y: number
+    color: string
+    radius: number
+    alpha: number
+    angle: number
+    speed: number
+    gravity: number
+    fade: number
+}
 
-const FireworksCanvas: React.FC = () => {
+const FireworksCanvas = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
@@ -11,7 +22,7 @@ const FireworksCanvas: React.FC = () => {
 
         let w = (canvas.width = window.innerWidth);
         let h = (canvas.height = window.innerHeight);
-        const particles: any[] = [];
+        const particles: Particle[] = [];
 
         const colors = ["#ff4d4d", "#ffd93d", "#4d96ff", "#9d4edd", "#00f5d4", "#ff8fab"];
 
