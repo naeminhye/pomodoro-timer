@@ -27,3 +27,13 @@ export const MODE_COLORS = {
 };
 
 export const HIDE_ESC_FS_BUTTON_TIMEOUT = 3000; // 3s
+
+export const FOCUS_COMPLETE_MESSAGES = [
+  "Pomodoro complete! Great job staying focused! 💪",
+  "You did it! One more Pomodoro crushed 💥",
+  "Focus session done! Time for a short break ☕",
+  "Well done! You stayed on task — now take 5 minutes off 😌",
+  "That’s another Pomodoro down. Keep up the momentum!",
+  "Focus mode: off. Relax mode: on 🌿",
+  "Awesome! You gave your best effort this round 🔥",
+];

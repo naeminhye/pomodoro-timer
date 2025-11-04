@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form"
 
-import { AlarmClockCheck, Settings, Sun, Moon, PictureInPicture, Expand, Shrink } from 'lucide-react';
+import { AlarmClockCheck, Settings, Sun, Moon, FileClock, Expand, Shrink, RotateCcw } from 'lucide-react';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,36 +13,43 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogDescription
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import {
     Field,
-    FieldDescription,
-    FieldError,
+    // FieldDescription,
+    // FieldError,
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field"
 import { useTimerSettingsStore } from "@/store/timerSettingsStore";
 import { useTheme } from "@/components/theme-provider"
 import { DEFAULT_LONG_BREAK_INTERVAL, DEFAULT_TIMES_IN_SECONDS, MODES } from "@/utils/constants";
+import HistoryBoard from "../HistoryBoard";
 
 
 const Header = (props: any) => { // TODO: add props
-    const { onShowPiP, isFullScreen, onToggleFullScreen } = props;
+    const { isFullScreen, onToggleFullScreen } = props;
 
     const { theme, setTheme } = useTheme();
 
     const setSettings = useTimerSettingsStore((state) => state.setSettings);
-    // const { focusTime, shortBreakTime, longBreakTime,autoBreak, autoFocus, longBreakInterval } = useTimerSettingsStore((state) => state.getTimerSettings)();
+    const { focusTime, shortBreakTime, longBreakTime, autoBreak, autoFocus, longBreakInterval, resetTimerSetting } = useTimerSettingsStore();
 
-    const focusTime = useTimerSettingsStore((state) => state.focusTime);
-    const shortBreakTime = useTimerSettingsStore((state) => state.shortBreakTime);
-    const longBreakTime = useTimerSettingsStore((state) => state.longBreakTime);
-    const autoBreak = useTimerSettingsStore((state) => state.autoBreak);
-    const autoFocus = useTimerSettingsStore((state) => state.autoFocus);
-    const longBreakInterval = useTimerSettingsStore((state) => state.longBreakInterval);
+    const [openSetting, setOpenSetting] = useState<boolean>(false);
+    const [openHistory, setOpenHistory] = useState<boolean>(false);
 
     const form = useForm({
         defaultValues: {
@@ -65,8 +72,6 @@ const Header = (props: any) => { // TODO: add props
 
             // Call the batch update action
             setSettings(updates);
-            console.log("Saving new settings:", updates);
-            console.log('Settings updated successfully!');
         },
     });
 
@@ -78,17 +83,35 @@ const Header = (props: any) => { // TODO: add props
         theme === "dark" ? setTheme("light") : setTheme("dark");
     }
 
+    useEffect(() => {
+        form.reset();
+    }, [focusTime, shortBreakTime, longBreakTime, autoBreak, autoFocus, longBreakInterval])
+
     return (
         <div className="flex justify-between items-center">
             <div className="flex gap-2 justify-center items-center"><AlarmClockCheck /><span className="font-bold text-xl">Pomodoro</span></div>
             <div className="flex gap-2 justify-center items-center">
-                <Button variant="outline" size="icon" className="rounded-full" onClick={onShowPiP}><PictureInPicture /></Button>
-
-                <Dialog>
+                <Dialog open={openHistory} onOpenChange={(open) => setOpenHistory(open)}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="icon" className="rounded-full"><FileClock /></Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle className="uppercase font-bold">History</DialogTitle>
+                            <DialogDescription>
+                                Pomodoro History
+                            </DialogDescription>
+                        </DialogHeader>
+                        <HistoryBoard />
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={openSetting} onOpenChange={(open) => setOpenSetting(open)}>
                     <form id="setting-form"
                         onSubmit={(e) => {
                             e.preventDefault()
-                            form.handleSubmit()
+                            form.handleSubmit().then(() => {
+                                setOpenSetting(false);
+                            });
                         }}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="icon" className="rounded-full"><Settings /></Button>
@@ -153,7 +176,6 @@ const Header = (props: any) => { // TODO: add props
                                                 </Field>)
                                         }} />
                                 </div>
-
                                 <form.Field
                                     name="autoBreak"
                                     children={(field) => {
@@ -170,7 +192,6 @@ const Header = (props: any) => { // TODO: add props
                                                 </div>
                                             </Field>)
                                     }} />
-
                                 <form.Field
                                     name="autoFocus"
                                     children={(field) => {
@@ -187,14 +208,13 @@ const Header = (props: any) => { // TODO: add props
                                                 </div>
                                             </Field>)
                                     }} />
-
                                 <form.Field
                                     name="longBreakInterval"
                                     children={(field) => {
                                         return (
                                             <Field>
                                                 <div className="flex justify-between items-center">
-                                                    <FieldLabel htmlFor={field.name}>Long Break interval</FieldLabel>
+                                                    <FieldLabel htmlFor={field.name}>Long Break Interval</FieldLabel>
                                                     <Input id={field.name}
                                                         name={field.name}
                                                         value={field.state.value}
@@ -204,6 +224,22 @@ const Header = (props: any) => { // TODO: add props
                                                 </div>
                                             </Field>)
                                     }} />
+                                <div className="flex justify-center items-center">
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="link" className="text-sm font-semibold text-destructive"><RotateCcw /> Reset Timer Setting</Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure to reset timer setting?</AlertDialogTitle>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={resetTimerSetting}>Continue</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
                             </FieldGroup>
                             <DialogFooter>
                                 <DialogClose asChild>

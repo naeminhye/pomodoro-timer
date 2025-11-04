@@ -42,5 +42,8 @@ const playSound = (url: string, onEnded?: () => void) => {
         });
 };
 
+function getRandomMessage(list: string[]) {
+    return list[Math.floor(Math.random() * list.length)];
+}
 
-export { timeConverter, toKebabCase, zeroPad, playSound }
+export { timeConverter, toKebabCase, zeroPad, playSound, getRandomMessage }

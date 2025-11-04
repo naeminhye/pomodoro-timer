@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { BicepsFlexed, Coffee, Footprints, RotateCcw, Smile } from 'lucide-react';
+import { useMemo } from 'react';
+import { BicepsFlexed, Coffee, Footprints, RotateCcw } from 'lucide-react';
 import { DynamicIcon } from 'lucide-react/dynamic';
 
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ interface ControllerProps {
     mode: PomodoroMode;
     onMainClick: any; // TODO: add interface
     onResetClick: any; // TODO: add interface
-    onStartMode: any
+    onStartMode: any;
 }
 
 function Controller(props: ControllerProps) {
@@ -69,7 +69,7 @@ function Controller(props: ControllerProps) {
                         <BicepsFlexed />
                         <span className="hidden sm:inline">Start Focus</span>
                     </Button>
-                    <Button variant="default"  aria-label={mode} onClick={() => onStartMode(mode)}>
+                    <Button variant="default" aria-label={mode} onClick={() => onStartMode(mode)}>
                         <RotateCcw />
                         <span className="hidden sm:inline">Another {mode}</span>
                     </Button>

@@ -16,7 +16,7 @@ function Timer(props: any) {
   }, [h, m, s]);
 
   return (
-    <div className="flex flex-row text-6xl sm:text-9xl lg:text-[180px] font-extrabold justify-center items-center">
+    <div className="flex flex-row text-6xl sm:text-9xl lg:text-[180px] font-extrabold justify-center items-center text-neutral-900 dark:text-neutral-50">
       {h !== '00' && <>
         <span>{h}</span>
         <span className="mx-2 sm:mx-4 text-5xl sm:text-8xl lg:text-[160px]">:</span>
