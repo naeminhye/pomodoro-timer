@@ -3,18 +3,36 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PomodoroMode, TimerState } from "@/utils/types";
 import { Progress } from "@/components/ui/progress"
 
-import { DEFAULT_TIMES_IN_SECONDS, MODES } from "@/utils/constants";
+import { MODES } from "@/utils/constants";
+import { useTimerSettingsStore } from "@/store/timerSettingsStore";
 
 import Timer from "../Timer";
 import Controller from "../Controller";
 import ModeSelector from "../ModeSelector";
+import { playAlarm } from "@/utils/helpers";
+
+const ALARM_SOUND_URL = "/sounds/alarm_beep.mp3";
 
 function PomodoroTimer() {
-    const [currentMode, setCurrentMode] = useState<PomodoroMode>(MODES.FOCUS);
-    const [timeRemaining, setTimeRemaining] = useState<number>(DEFAULT_TIMES_IN_SECONDS[MODES.FOCUS]);
-    const [timerState, setTimerState] = useState<TimerState>("IDLE");
+    const focusTime = useTimerSettingsStore((state) => state.focusTime);
+    const shortBreakTime = useTimerSettingsStore((state) => state.shortBreakTime);
+    const longBreakTime = useTimerSettingsStore((state) => state.longBreakTime);
+    const autoFocus = useTimerSettingsStore((state) => state.autoFocus);
+    const autoBreak = useTimerSettingsStore((state) => state.autoBreak);
+    const longBreakInterval = useTimerSettingsStore((state) => state.longBreakInterval);
 
-    const progress = useMemo(() => (100 - Math.floor(timeRemaining / DEFAULT_TIMES_IN_SECONDS[currentMode] * 100)), [timeRemaining]);
+    const timeOfModes = useMemo(() => ({
+        [MODES.FOCUS]: focusTime,
+        [MODES.SHORT_BREAK]: shortBreakTime,
+        [MODES.LONG_BREAK]: longBreakTime
+    }), [focusTime, shortBreakTime, longBreakTime]);
+
+    const [currentMode, setCurrentMode] = useState<PomodoroMode>(MODES.FOCUS);
+    const [timeRemaining, setTimeRemaining] = useState<number>(0);
+    const [timerState, setTimerState] = useState<TimerState>("IDLE");
+    const [focusCount, setFocusCount] = useState<number>(0);
+
+    const progress = useMemo(() => (100 - Math.floor(timeRemaining / timeOfModes[currentMode] * 100)), [timeRemaining]);
     const intervalRef = useRef<any>(null); // TODO: fix issue
 
     const handleStartResumeTimer = useCallback(() => {
@@ -29,13 +47,37 @@ function PomodoroTimer() {
                 if (prevTime <= 1) {
                     clearInterval(intervalRef.current);
                     setTimerState('STOPPED');
+                    playAlarm(ALARM_SOUND_URL, () => {
+                        console.log("Finished playing sound!");
+                    });
+                    // Handle auto focus/autobreak
+                    if (currentMode === MODES.FOCUS) {
+                        const count = focusCount + 1;
+                        setFocusCount(count);
+                        if (autoBreak) {
+                            if (count < longBreakInterval) {
+                                // Auto run Short Break
+                                handleStartMode(MODES.SHORT_BREAK);
+                            }
+                            else {
+                                // Auto run Long Break
+                                handleStartMode(MODES.LONG_BREAK);
+                                setFocusCount(0);
+                            }
+                        }
+                    }
+                    else {
+                        if (autoFocus) {
+                            handleStartMode(MODES.FOCUS);
+                        }
+                    }
                     return 0;
                 }
                 return prevTime - 1;
             });
         }, 1000);
         intervalRef.current = id;
-    }, [timerState, setTimerState, timeRemaining, setTimeRemaining])
+    }, [timerState, setTimerState, timeRemaining, setTimeRemaining]);
 
     const handleMainButtonClick = useCallback(() => {
         if (timerState === "IDLE" || timerState === "PAUSED") {
@@ -56,19 +98,23 @@ function PomodoroTimer() {
             intervalRef.current = null;
         }
         setTimerState("IDLE");
-        setTimeRemaining(DEFAULT_TIMES_IN_SECONDS[currentMode]);
+        setTimeRemaining(timeOfModes[currentMode]);
     }, [setTimerState]);
 
     const handleChangeMode = useCallback((mode: PomodoroMode) => {
         handleResetTimer();
         setCurrentMode(mode);
-        setTimeRemaining(DEFAULT_TIMES_IN_SECONDS[mode]);
+        setTimeRemaining(timeOfModes[mode]);
     }, [setCurrentMode]);
 
     const handleStartMode = useCallback((mode: PomodoroMode) => {
         handleChangeMode(mode);
         handleStartResumeTimer();
-    }, [handleChangeMode, handleStartResumeTimer])
+    }, [handleChangeMode, handleStartResumeTimer]);
+
+    useEffect(() => {
+        setTimeRemaining(timeOfModes[currentMode]);
+    }, [JSON.stringify(timeOfModes), currentMode]);
 
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-4">

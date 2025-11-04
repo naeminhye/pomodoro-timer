@@ -23,43 +23,45 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { useTimerSettingsStore } from "@/store/timerSettingsStore";
-import { useCallback } from "react";
 import { useTheme } from "@/components/theme-provider"
+import { DEFAULT_LONG_BREAK_INTERVAL, DEFAULT_TIMES_IN_SECONDS, MODES } from "@/utils/constants";
 
 
 function Header() {
-    const { theme, setTheme } = useTheme()
+    const { theme, setTheme } = useTheme();
 
     const setSettings = useTimerSettingsStore((state) => state.setSettings);
-    const currentStoreState = useTimerSettingsStore.getState();
-
-
+    // const { focusTime, shortBreakTime, longBreakTime,autoBreak, autoFocus, longBreakInterval } = useTimerSettingsStore((state) => state.getTimerSettings)();
+    
+    const focusTime = useTimerSettingsStore((state) => state.focusTime);
+    const shortBreakTime = useTimerSettingsStore((state) => state.shortBreakTime);
+    const longBreakTime = useTimerSettingsStore((state) => state.longBreakTime);
+    const autoBreak = useTimerSettingsStore((state) => state.autoBreak);
+    const autoFocus = useTimerSettingsStore((state) => state.autoFocus);
+    const longBreakInterval = useTimerSettingsStore((state) => state.longBreakInterval);
+    
     const form = useForm({
         defaultValues: {
-            focusTime: currentStoreState?.focusTime ?? 25,
-            shortBreakTime: currentStoreState?.shortBreakTime ?? 5,
-            longBreakTime: currentStoreState?.longBreakTime ?? 15,
-            autoBreak: currentStoreState?.autoBreak ?? false,
-            autoFocus: currentStoreState?.autoFocus ?? false,
-            longBreakInterval: currentStoreState?.longBreakInterval ?? 4,
+            focusTime: (focusTime ?? DEFAULT_TIMES_IN_SECONDS[MODES.FOCUS]) / 60,
+            shortBreakTime: (shortBreakTime ?? DEFAULT_TIMES_IN_SECONDS[MODES.SHORT_BREAK]) / 60,
+            longBreakTime: (longBreakTime ?? DEFAULT_TIMES_IN_SECONDS[MODES.LONG_BREAK]) / 60,
+            autoBreak: autoBreak ?? false,
+            autoFocus: autoFocus ?? false,
+            longBreakInterval: longBreakInterval ?? DEFAULT_LONG_BREAK_INTERVAL,
         },
-        // validators: {
-        //     onSubmit: formSchema,
-        // },
         onSubmit: async ({ value }) => {
-            console.log("Saving new settings:", value);
-
             const updates = {
-                focusTime: value.focusTime,
-                shortBreakTime: value.shortBreakTime,
-                longBreakTime: value.longBreakTime,
+                focusTime: Number(value.focusTime) * 60,
+                shortBreakTime: Number(value.shortBreakTime) * 60,
+                longBreakTime: Number(value.longBreakTime) * 60,
                 autoBreak: value.autoBreak,
                 autoFocus: value.autoFocus,
-                longBreakInterval: value.longBreakInterval,
+                longBreakInterval: Number(value.longBreakInterval),
             };
 
             // Call the batch update action
             setSettings(updates);
+            console.log("Saving new settings:", updates);
             console.log('Settings updated successfully!');
         },
     });

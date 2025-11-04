@@ -18,6 +18,8 @@ export const DEFAULT_TIMES_IN_SECONDS = {
     [MODES.LONG_BREAK]: 900,
 };
 
+export const DEFAULT_LONG_BREAK_INTERVAL = 4;
+
 export const MODE_COLORS = {
     [MODES.FOCUS]: '#dc3545',       // A red/tomato color
     [MODES.SHORT_BREAK]: '#28a745',  // A green color

@@ -1,13 +1,21 @@
 function zeroPad(num: number): string {
-    const numString = String(num);
-    return numString.padStart(2, '0');
+    return String(num).padStart(2, '0');
 }
 
-function timeConverter(timeInSec: number): { m: number, s: number } {
+function timeConverter(timeInSec: number): { h: string, m: string, s: string } {
+    const hours = Math.floor(timeInSec / 3600);
+    const minutes = Math.floor((timeInSec % 3600) / 60);
+    const seconds = timeInSec % 60;
+
+    const formattedHours = zeroPad(hours);
+    const formattedMinutes = zeroPad(minutes);
+    const formattedSeconds = zeroPad(seconds);
+
     return {
-        m: Math.floor(timeInSec / 60),
-        s: timeInSec % 60
-    }
+        h: formattedHours,
+        m: formattedMinutes,
+        s: formattedSeconds
+    };
 }
 
 function toKebabCase(str: string) {
@@ -17,4 +25,22 @@ function toKebabCase(str: string) {
         .toLowerCase(); // Convert the entire string to lowercase
 }
 
-export { timeConverter, toKebabCase, zeroPad }
+const playAlarm = (url: string, onEnded?: () => void) => {
+    const audio = new Audio(url);
+    audio.loop = false;
+    audio.volume = 1;
+    if (onEnded) {
+        audio.addEventListener("ended", onEnded);
+    }
+
+    audio.play()
+        .then(() => {
+            console.log("Sound is playing...");
+        })
+        .catch((error) => {
+            console.error("Cannot play sound:", error);
+        });
+};
+
+
+export { timeConverter, toKebabCase, zeroPad, playAlarm }

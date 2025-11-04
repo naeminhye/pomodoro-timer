@@ -1,58 +1,72 @@
 import { create } from 'zustand';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+
+import { DEFAULT_LONG_BREAK_INTERVAL, DEFAULT_TIMES_IN_SECONDS, MODES } from '@/utils/constants';
 
 interface HistoryEntry {
-  // Define fields for a single history item, e.g.:
   timestamp: number;
   duration: number;
   type: 'focus' | 'shortBreak' | 'longBreak';
 }
+
 interface TimerSettingsState {
+  // Timer setting
   focusTime: number;
   shortBreakTime: number;
   longBreakTime: number;
   autoBreak: boolean;
   autoFocus: boolean;
   longBreakInterval: number;
+  history: Record<string, HistoryEntry>;
 
-  // Data (Object/Map)
-  history: Record<string, HistoryEntry>; // A map of string keys to HistoryEntry objects
-
-  // Actions
-  setSetting: <K extends keyof Omit<TimerSettingsState, 'history' | 'setSetting' | 'addHistory'>>(key: K, value: TimerSettingsState[K]) => void;
-  setSettings: (updates: Partial<Omit<TimerSettingsState, 'history' | 'setSettings' | 'addHistory'>>) => void;
+  setSetting: <K extends keyof Omit<TimerSettingsState, 'history' | 'setSetting' | 'addHistory' | 'setSettings'>>(
+    key: K,
+    value: TimerSettingsState[K]
+  ) => void;
+  setSettings: (updates: Partial<Omit<TimerSettingsState, 'history' | 'setSetting' | 'addHistory' | 'setSettings'>>) => void;
   addHistory: (entry: HistoryEntry) => void;
+  getTimerSettings: () => any;
 }
 
-export const useTimerSettingsStore = create<TimerSettingsState>((set) => ({
-  // Initial State
-  focusTime: 25,
-  shortBreakTime: 5,
-  longBreakTime: 15,
-  autoBreak: false,
-  autoFocus: false,
-  longBreakInterval: 4,
-  history: {},
+export const useTimerSettingsStore = create<TimerSettingsState>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        // --- Initial State ---
+        focusTime: DEFAULT_TIMES_IN_SECONDS[MODES.FOCUS],
+        shortBreakTime: DEFAULT_TIMES_IN_SECONDS[MODES.SHORT_BREAK],
+        longBreakTime: DEFAULT_TIMES_IN_SECONDS[MODES.LONG_BREAK],
+        autoBreak: false,
+        autoFocus: false,
+        longBreakInterval: DEFAULT_LONG_BREAK_INTERVAL,
+        history: {},
 
-  // --- Actions ---
-
-  // Generic action for updating any top-level setting field
-  setSetting: (key, value) => {
-    // We use the functional form of 'set' to update the state
-    set(() => ({
-      [key]: value, // TypeScript safely maps the key to the value type
-    }));
-  },
-  setSettings: (updates) => {
-    // 'set' automatically merges the new object with the existing state.
-    set(updates);
-  },
-  // Specific action to add an item to the history object
-  addHistory: (entry) => {
-    set((state) => ({
-      history: {
-        ...state.history,
-        [entry.timestamp.toString()]: entry, // Use timestamp as a unique key
+        // --- Actions ---
+        setSetting: (key, value) => set({ [key]: value }),
+        setSettings: (updates) => {
+          set(updates);
+          // Save settings to LocalStorage
+        },
+        addHistory: (entry) =>
+          set((state) => ({
+            history: {
+              ...state.history,
+              [entry.timestamp.toString()]: entry,
+            },
+          })),
+        getTimerSettings: () => ({
+          focusTime: get().focusTime,
+          shortBreakTime: get().shortBreakTime,
+          longBreakTime: get().longBreakTime,
+          autoBreak: get().autoBreak,
+          autoFocus: get().autoFocus,
+          longBreakInterval: get().longBreakInterval,
+        })
+      }),
+      {
+        name: 'pomodoro-timer-storage',
+        storage: createJSONStorage(() => sessionStorage),
       },
-    }));
-  },
-}));
+    )
+  )
+);
